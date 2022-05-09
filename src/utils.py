@@ -1,60 +1,53 @@
 from chromosome import Chromosome
 from numpy.random import rand
-from numpy import array
+
+from individual import Individual
 
 
 class Utils:
     """ Helper to write the best solution in a .txt file. """
     @staticmethod
-    def generate_file_output(chromosome: Chromosome) -> bool:
-        data = ''
-        for gene in chromosome.genes:
-            data += '{}\n'.format(''.join(gene))
-        with open("output.txt", "w") as f:
-            f.write(data)
+    def generate_file_output(individual: Individual) -> bool:
+        data = ''.join(''.join(chromosome.genes) +
+                       '\n' for chromosome in individual.chromosomes)
+        try:
+            with open("output.txt", "w") as f:
+                f.write(data)
+        except(Exception):
+            return False
+
         return True
 
     """ Orchestrate a complete sanitization. """
     @staticmethod
-    def sanitize_chromosome(chromosome: Chromosome) -> Chromosome:
-        Utils.complete_with_gaps(chromosome)
+    def sanitize_individual(individual: Individual) -> Individual:
+        Utils.complete_with_gaps(individual)
 
         # TODO: check...
-        # Utils.delete_full_gaps_col(chromosome)
+        # Utils.delete_full_gaps_col(individual)
 
-        Utils.complete_with_gaps(chromosome)
+        Utils.complete_with_gaps(individual)
 
-        return chromosome
+        return individual
 
     """ Delete columns full with gaps. """
     @staticmethod
     def delete_full_gaps_col(chromosome: Chromosome) -> Chromosome:
-        cols = array(chromosome.genes).T
-        cols_num = len(cols)
-        rows_num = len(cols[0])
-
-        elements_to_delete = []
-        for i in range(cols_num):
-            if list(cols[i]).count('-') == rows_num:
-                elements_to_delete.append(i)
-
-        for i in range(len(chromosome.genes)):
-            for e in elements_to_delete:
-                chromosome.genes[i].remove(chromosome.genes[i][e])
+        ...
 
         return chromosome
 
     """ Add gaps at the end to have the chromosomes with the same length. """
     @staticmethod
-    def complete_with_gaps(chromosome: Chromosome) -> Chromosome:
+    def complete_with_gaps(individual: Individual) -> Individual:
         # Complete with gaps.
-        for i in range(len(chromosome.genes)):
+        for i in range(len(individual.chromosomes)):
             diff = Utils.calc_genes_num(
-                chromosome.genes) - len(chromosome.genes[i])
-            for j in range(diff):
-                chromosome.genes[i] += "-"
+                individual.chromosomes) - len(individual.chromosomes[i].genes)
+            for _ in range(diff):
+                individual.chromosomes[i].genes += "-"
 
-        return chromosome
+        return individual
 
     """ The initial population mutation. """
     @staticmethod
@@ -81,12 +74,12 @@ class Utils:
 
     """ Calc the maximum number of genes of the chromosomes. """
     @staticmethod
-    def calc_genes_num(chromosomes: list[list[str]]) -> int:
+    def calc_genes_num(chromosomes: list[Chromosome]) -> int:
         m_aux = 0
         lengths = []
 
         for chromosome in chromosomes:
-            length = len(chromosome)
+            length = len(chromosome.genes)
             lengths.append(length)
 
             if length >= m_aux:
@@ -97,11 +90,7 @@ class Utils:
     """ Count the number of no-gaps character in the chromosome. """
     @staticmethod
     def count_sequence_char(sequence: list[str]) -> int:
-        count = 0
-        for char in sequence:
-            if char != '-':
-                count += 1
-        return count
+        return sum(char != '-' for char in sequence)
 
     # TODO: refact needed.
     """ Splite the chromosome to crossover later. """
@@ -119,3 +108,11 @@ class Utils:
         pt = (no_gaps_num + gaps_num)
 
         return [sequence[:pt], sequence[pt:]]
+
+    """ Basic Lineal Algebra:  transpose a matrix to get the cols as rows and the rows as cols. """
+    @staticmethod
+    def transpose_matrix(matrix: list[list[str]]) -> list[list[str]]:
+        rows_len = len(matrix)
+        cols_len = len(matrix[0])
+
+        return [[matrix[row_i][col_i] for row_i in range(rows_len)] for col_i in range(cols_len)]

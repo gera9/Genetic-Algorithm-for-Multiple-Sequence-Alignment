@@ -7,8 +7,8 @@ def main() -> None:
     # Initialize Genetic Algorithm object.
     ga = GeneticAlgorithm(
         bits_num=21,
-        population_length=20,
-        generations_num=20,
+        population_length=50,
+        generations_num=50,
         crossover_rate=0.9,
         mutation_rate=1.0
     )
@@ -29,7 +29,9 @@ def main() -> None:
         total_time = (end - start)
         print('--- Done! ---')
         print('--- Execution time: {0:.2f} s ---'.format(total_time))
-        print('--- Score solution: {} % ---'.format(best.score))
+        print(f'--- Score solution: {best.score} % ---')
+    else:
+        print('Error generating the output file.')
 
 
 if __name__ == '__main__':
