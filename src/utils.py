@@ -1,5 +1,5 @@
 from chromosome import Chromosome
-from numpy.random import rand
+from random import random
 
 from individual import Individual
 
@@ -54,7 +54,7 @@ class Utils:
     def add_random_gaps(chromosome: list[str]) -> list[str]:
         for i in range(len(chromosome)):
             # Check for a mutation.
-            if rand() < 0.09:
+            if random() < 0.09:
                 # Put a gap.
                 chromosome[i] = '-'
 

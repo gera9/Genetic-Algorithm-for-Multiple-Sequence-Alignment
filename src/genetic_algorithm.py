@@ -3,8 +3,8 @@ from statistics import mode
 from chromosome import Chromosome
 from individual import Individual
 from utils import Utils
-from numpy import random
-from numpy.random import rand
+from random import randint, random, choices
+
 
 
 class GeneticAlgorithm:
@@ -83,14 +83,14 @@ class GeneticAlgorithm:
         individual_probabilities = [
             individual.score/population_fitness for individual in self.population]
 
-        return random.choice(self.population, p=individual_probabilities)
+        return choices(self.population, weights=individual_probabilities, k=1)[0]
 
     def crossover(self, p1: Individual, p2: Individual) -> list[Individual]:
         # Children are copies of parents by default.
         c1, c2 = copy.copy(p1), copy.copy(p2)
 
         # Select random cut point.
-        cut_point = random.randint(0, len(c1.chromosomes[0].genes))
+        cut_point = randint(0, len(c1.chromosomes[0].genes)-1)
 
         # Represent the childs as a matrix to cut them given the cut point.
         c1_matrix = [list(chrom.genes) for chrom in c1.chromosomes]
@@ -129,7 +129,7 @@ class GeneticAlgorithm:
         for chromosome in individual.chromosomes:
             for gen_i in range(len(chromosome.genes)):
                 # Check for a mutation.
-                if rand() < self.mutation_rate:
+                if random() < self.mutation_rate:
                     # Put a gap.
                     chromosome.genes[gen_i] = '-'
 
